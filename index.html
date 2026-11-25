@@ -6,6 +6,11 @@
 <title>Festive Netball Tournament</title>
 <meta name="description" content="Live scores, league table and finals for the Festive Netball Tournament.">
 <meta name="theme-color" content="#0E271D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Netball Cup">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='40' r='34' fill='%23FFFDF7' stroke='%231D2B24' stroke-width='4'/%3E%3Cpath d='M8 34c14 6 50 6 64 0M8 46c14-6 50-6 64 0M40 6c-9 14-9 54 0 68M40 6c9 14 9 54 0 68' fill='none' stroke='%23B3242F' stroke-width='4'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -69,10 +74,10 @@
   </header>
 
   <nav class="tabs" aria-label="Sections">
-    <a href="#games" data-tab="games">Games</a>
-    <a href="#table" data-tab="table">Table</a>
-    <a href="#versus" data-tab="versus">Head to head</a>
-    <a href="#finals" data-tab="finals">Finals</a>
+    <a href="#games" data-tab="games"><svg class="tab-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.8 10.5c5 2 11.4 2 16.4 0M3.8 13.5c5-2 11.4-2 16.4 0M12 3.5c-2.6 4-2.6 13 0 17M12 3.5c2.6 4 2.6 13 0 17"/></svg><span>Games</span></a>
+    <a href="#table" data-tab="table"><svg class="tab-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="4" cy="6" r=".6"/><path d="M8 4v16"/></svg><span>Table</span></a>
+    <a href="#versus" data-tab="versus"><svg class="tab-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg><span>Head to head</span></a>
+    <a href="#finals" data-tab="finals"><svg class="tab-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7"/></svg><span>Finals</span></a>
   </nav>
 
   <div id="banner" class="banner" hidden></div>
@@ -111,9 +116,9 @@
       <div class="panel">
         <div class="panel-head">
           <h2 id="h-versus">Head to head</h2>
-          <p>Each team meets every other team twice. Read across a row to see how that team did against each opponent. Tap a result to change it.</p>
+          <p class="hide-sm">Each team meets every other team twice. Read across a row to see how that team did against each opponent. Tap a result to change it.</p><p class="sm-only">Each team meets every other team twice. Tap a result to change it.</p>
         </div>
-        <div class="scroll"><table class="versus" id="versus"></table></div>
+        <div class="scroll hide-sm"><table class="versus" id="versus"></table></div>
       </div>
       <div class="team-cards" id="team-cards"></div>
     </section>

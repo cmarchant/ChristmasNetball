@@ -6,7 +6,7 @@ Live scores for a four-team Christmas netball tournament: Jingle Ballers, Santa'
 
 ## What it does
 
-- **Games**: all 12 league games in four rounds. Tap a game to enter the score.
+- **Games**: all 12 league games in two rounds, each split into three parts of two games (1A–1C, 2A–2C). Tap a game to enter the score.
 - **Table**: the league table worked out for you (P, W, D, L, goals, goal difference, points, form) and who is still in the race for the Grand Final.
 - **Head to head**: how each team did against every other team.
 - **Finals**: once the league is finished, 1st plays 2nd in the Grand Final and 3rd plays 4th for third place. Level at full time goes to a golden goal.

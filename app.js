@@ -1,4 +1,5 @@
 "use strict";
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* ================= Tournament data ================= */
 const TEAMS = {
@@ -10,18 +11,18 @@ const TEAMS = {
 const KEYS = ["JB", "SS", "NC", "RR"];
 
 const LEAGUE = [
-  { n: 1, round: "Round 1A", a: "JB", b: "SS" },
-  { n: 2, round: "Round 1A", a: "NC", b: "RR" },
-  { n: 3, round: "Round 1A", a: "JB", b: "NC" },
-  { n: 4, round: "Round 1B", a: "SS", b: "RR" },
-  { n: 5, round: "Round 1B", a: "JB", b: "RR" },
-  { n: 6, round: "Round 1B", a: "SS", b: "NC" },
-  { n: 7, round: "Round 2A", a: "RR", b: "NC" },
-  { n: 8, round: "Round 2A", a: "SS", b: "JB" },
-  { n: 9, round: "Round 2A", a: "RR", b: "SS" },
-  { n: 10, round: "Round 2B", a: "NC", b: "JB" },
-  { n: 11, round: "Round 2B", a: "NC", b: "SS" },
-  { n: 12, round: "Round 2B", a: "RR", b: "JB" },
+  { n: 1, round: "1A", a: "JB", b: "SS" },
+  { n: 2, round: "1A", a: "NC", b: "RR" },
+  { n: 3, round: "1B", a: "JB", b: "NC" },
+  { n: 4, round: "1B", a: "SS", b: "RR" },
+  { n: 5, round: "1C", a: "JB", b: "RR" },
+  { n: 6, round: "1C", a: "SS", b: "NC" },
+  { n: 7, round: "2A", a: "RR", b: "NC" },
+  { n: 8, round: "2A", a: "SS", b: "JB" },
+  { n: 9, round: "2B", a: "RR", b: "SS" },
+  { n: 10, round: "2B", a: "NC", b: "JB" },
+  { n: 11, round: "2C", a: "NC", b: "SS" },
+  { n: 12, round: "2C", a: "RR", b: "JB" },
 ];
 const FINALS = [
   { n: 13, name: "Third-place playoff", seeds: [3, 4] },
@@ -188,11 +189,18 @@ function renderHero() {
 }
 
 function renderGames() {
-  $("#rounds").innerHTML = ROUNDS.map(round => {
-    const games = LEAGUE.filter(g => g.round === round);
-    const done = games.every(g => result(g.n));
-    return `<section class="round"><div class="round-head"><h2>${round}</h2><span>Games ${games[0].n}–${games[games.length - 1].n}</span>${done ? '<span class="round-done">All played</span>' : ""}</div>
-      <div class="cards">${games.map(g => matchCard(g.n)).join("")}</div></section>`;
+  const big = [...new Set(ROUNDS.map(r => r[0]))];
+  $("#rounds").innerHTML = big.map(b => {
+    const parts = ROUNDS.filter(r => r[0] === b);
+    const roundGames = LEAGUE.filter(g => g.round[0] === b);
+    const playedHere = roundGames.filter(g => result(g.n)).length;
+    return `<section class="round"><div class="round-title"><h2>Round ${b}</h2><span>${playedHere} of ${roundGames.length} played</span></div>
+      <div class="parts">${parts.map(part => {
+        const games = LEAGUE.filter(g => g.round === part);
+        const done = games.every(g => result(g.n));
+        return `<div class="part"><div class="round-head"><h3>Round ${part}</h3><span>Games ${games.map(g => g.n).join(" &amp; ")}</span>${done ? '<span class="round-done">✓ Played</span>' : ""}</div>
+          <div class="cards">${games.map(g => matchCard(g.n)).join("")}</div></div>`;
+      }).join("")}</div></section>`;
   }).join("");
 }
 
@@ -200,14 +208,14 @@ function renderTable() {
   const rows = standings();
   const done = leagueDone();
   const statusText = { in: "Grand Final", out: "Playoff", hunt: "In the hunt" };
-  $("#league").innerHTML = `<thead><tr><th>Pos</th><th class="left">Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th><th class="left">Form</th><th class="left">${done ? "Into" : "Final race"}</th></tr></thead><tbody>` +
+  $("#league").innerHTML = `<thead><tr><th>Pos</th><th class="left">Team</th><th>P</th><th class="hide-sm">W</th><th class="hide-sm">D</th><th class="hide-sm">L</th><th class="hide-sm">GF</th><th class="hide-sm">GA</th><th>GD</th><th>Pts</th><th class="left hide-sm">Form</th><th class="left hide-sm">${done ? "Into" : "Final race"}</th></tr></thead><tbody>` +
     rows.map((r, i) => `<tr class="${i < 2 ? "zone-final" : "zone-playoff"}">
       <td class="pos">${r.tied ? "=" : ""}${r.pos}</td>
-      <td class="left"><div class="teamcell">${crest(r.key)}${esc(TEAMS[r.key].name)}</div></td>
-      <td>${r.P}</td><td>${r.W}</td><td>${r.D}</td><td>${r.L}</td><td>${r.GF}</td><td>${r.GA}</td><td>${r.GD > 0 ? "+" : ""}${r.GD}</td>
+      <td class="left"><div class="teamcell">${crest(r.key)}<span>${esc(TEAMS[r.key].name)}<span class="sm-only sub"><span class="status ${r.race}">${statusText[r.race]}</span> <span class="wdl">W${r.W} D${r.D} L${r.L}</span></span></span></div></td>
+      <td>${r.P}</td><td class="hide-sm">${r.W}</td><td class="hide-sm">${r.D}</td><td class="hide-sm">${r.L}</td><td class="hide-sm">${r.GF}</td><td class="hide-sm">${r.GA}</td><td>${r.GD > 0 ? "+" : ""}${r.GD}</td>
       <td class="ptscol">${r.Pts}</td>
-      <td class="left"><span class="form">${[...r.form.slice(-6), ...Array(Math.max(0, 6 - r.form.length)).fill("N")].map(f => `<i class="${f}" title="${{ W: "Won", D: "Drew", L: "Lost", N: "Not played" }[f]}">${f === "N" ? "" : f}</i>`).join("")}</span></td>
-      <td class="left"><span class="status ${r.race}">${statusText[r.race]}</span></td></tr>`).join("") + `</tbody>`;
+      <td class="left hide-sm"><span class="form">${[...r.form.slice(-6), ...Array(Math.max(0, 6 - r.form.length)).fill("N")].map(f => `<i class="${f}" title="${{ W: "Won", D: "Drew", L: "Lost", N: "Not played" }[f]}">${f === "N" ? "" : f}</i>`).join("")}</span></td>
+      <td class="left hide-sm"><span class="status ${r.race}">${statusText[r.race]}</span></td></tr>`).join("") + `</tbody>`;
 }
 
 function renderVersus() {
@@ -242,16 +250,28 @@ function renderVersus() {
         n++; p += g.a === k ? points(res[0], res[1]) : points(res[1], res[0]);
       });
       return { o, p, n };
-    }).filter(x => x.n);
+    });
+    const rowsVs = vs.map(({ o, p, n }) => {
+      const meets = LEAGUE.filter(g => (g.a === k && g.b === o) || (g.a === o && g.b === k)).map(g => {
+        const res = result(g.n);
+        if (!res) return `<button type="button" data-game="${g.n}"><span>–</span><small>G${g.n}</small></button>`;
+        const mine = g.a === k ? res[0] : res[1], theirs = g.a === k ? res[1] : res[0];
+        const c = mine > theirs ? "W" : mine === theirs ? "D" : "L";
+        return `<button type="button" class="${c}" data-game="${g.n}" aria-label="Game ${g.n}: ${mine}–${theirs}"><span>${mine}–${theirs}</span><small>G${g.n}</small></button>`;
+      }).join("");
+      return `<div class="vs-row"><span class="vs-name">v ${crest(o)}${esc(TEAMS[o].name)}</span><span class="h2h">${meets}</span><span class="vs-pts">${n ? ptsLabel(p) : ""}</span></div>`;
+    }).join("");
+    const played = vs.filter(x => x.n);
     let note = "No games played yet.";
-    if (vs.length) {
-      const best = [...vs].sort((a, b) => b.p - a.p)[0];
-      const worst = [...vs].sort((a, b) => a.p - b.p)[0];
+    if (played.length) {
+      const best = [...played].sort((a, b) => b.p - a.p)[0];
+      const worst = [...played].sort((a, b) => a.p - b.p)[0];
       note = best.o === worst.o ? `${ptsLabel(best.p)} against ${TEAMS[best.o].name} so far.`
         : `Best against ${TEAMS[best.o].name} (${ptsLabel(best.p)}). Toughest: ${TEAMS[worst.o].name} (${ptsLabel(worst.p)}).`;
     }
     return `<article class="team-card"><header>${crest(k)}<div><h3>${esc(TEAMS[k].name)}</h3><p>${r.tied ? "=" : ""}${ordinal(r.pos)} · ${r.P} of 6 played</p></div></header>
       <dl><div><dt>Pts</dt><dd>${r.Pts}</dd></div><div><dt>Goals</dt><dd>${r.GF}</dd></div><div><dt>GD</dt><dd>${r.GD > 0 ? "+" : ""}${r.GD}</dd></div></dl>
+      <div class="vs-list sm-only">${rowsVs}</div>
       <p class="best">${esc(note)}</p></article>`;
   }).join("");
 }
@@ -306,11 +326,15 @@ function showTab(name, scroll) {
     if (t === name) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
   });
   if (location.hash !== `#${name}`) history.replaceState(null, "", `#${name}`);
-  if (scroll) document.querySelector(".tabs").scrollIntoView({ behavior: "smooth", block: "start" });
+  if (scroll) {
+    const phone = matchMedia("(max-width: 620px)").matches;
+    const top = phone ? document.querySelector("main").getBoundingClientRect().top + scrollY - 12 : document.querySelector(".tabs").getBoundingClientRect().top + scrollY - 8;
+    if (scrollY > top) scrollTo({ top, behavior: reduceMotion ? "auto" : "smooth" });
+  }
 }
 window.addEventListener("hashchange", () => {
   const h = location.hash.slice(1);
-  if (TABS.includes(h)) showTab(h);
+  if (TABS.includes(h)) showTab(h, true);
 });
 
 /* ================= Score dialog ================= */
@@ -323,7 +347,7 @@ function openScore(n) {
   const r = result(n);
   const fin = FINALS.find(f => f.n === n);
   editing = { n, teams, fin, vals: r ? [...r] : [0, 0], golden: state.golden[n] };
-  $("#sd-round").textContent = fin ? `Game ${n}` : `${LEAGUE.find(g => g.n === n).round} · Game ${n}`;
+  $("#sd-round").textContent = fin ? `Game ${n}` : `Round ${LEAGUE.find(g => g.n === n).round} · Game ${n}`;
   $("#sd-title").textContent = fin ? fin.name : "Enter the score";
   dlg.querySelectorAll(".sd-team").forEach((el, i) => {
     const k = teams[i];
@@ -494,7 +518,6 @@ function toast(msg) {
 }
 
 /* ================= Snow & confetti ================= */
-const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 function snow() {
   const c = $("#snow"), ctx = c.getContext("2d");
   let w, h, flakes;
