@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Festive Netball Tournament</title>
+<meta name="description" content="Live scores, league table and finals for the Festive Netball Tournament.">
+<meta name="theme-color" content="#0E271D">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='40' r='34' fill='%23FFFDF7' stroke='%231D2B24' stroke-width='4'/%3E%3Cpath d='M8 34c14 6 50 6 64 0M8 46c14-6 50-6 64 0M40 6c-9 14-9 54 0 68M40 6c9 14 9 54 0 68' fill='none' stroke='%23B3242F' stroke-width='4'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@700&family=Nunito:wght@400;600;700;800;900&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<canvas id="snow" aria-hidden="true"></canvas>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="bell" viewBox="0 0 24 24">
+      <path d="M12 3.5c-3.4 0-5.6 2.6-5.6 6.1v4.2L4.2 17.6h15.6l-2.2-3.8V9.6c0-3.5-2.2-6.1-5.6-6.1z" fill="#D9A535" stroke="#8A6414" stroke-width="1"/>
+      <circle cx="12" cy="19.6" r="2" fill="#8A6414"/>
+      <path d="M9 3.6 12 2l3 1.6" fill="none" stroke="#B3242F" stroke-width="1.6" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="hat" viewBox="0 0 24 24">
+      <path d="M5 16.5Q7.5 6 16 4.2q4 1.2 3.4 6.6L18.6 16.5z" fill="#C42A36"/>
+      <rect x="3.4" y="15.2" width="17.4" height="5" rx="2.5" fill="#fff" stroke="#9AA59F" stroke-width="1"/>
+      <circle cx="19.3" cy="10.6" r="2.4" fill="#fff" stroke="#9AA59F" stroke-width="1"/>
+    </symbol>
+    <symbol id="tree" viewBox="0 0 24 24">
+      <polygon points="12,3 18.5,11 15,11 20,18.2 4,18.2 9,11 5.5,11" fill="#2A7352"/>
+      <rect x="10.6" y="18.2" width="2.8" height="3.6" fill="#7A4A26"/>
+      <circle cx="12" cy="3" r="2" fill="#D9A535"/>
+      <circle cx="10" cy="13.5" r="1" fill="#C42A36"/><circle cx="14.5" cy="15.5" r="1" fill="#F6E9C8"/>
+    </symbol>
+    <symbol id="deer" viewBox="0 0 24 24">
+      <path d="M9 10 6.2 4.2M6.9 7 3.6 5.6M7.6 6.2 8.4 2.8M15 10l2.8-5.8M17.1 7l3.3-1.4M16.4 6.2l-.8-3.4" stroke="#7A4A26" stroke-width="1.7" stroke-linecap="round" fill="none"/>
+      <ellipse cx="12" cy="15" rx="4.8" ry="6" fill="#9C6436"/>
+      <circle cx="10.2" cy="13.4" r=".9" fill="#1D2B24"/><circle cx="13.8" cy="13.4" r=".9" fill="#1D2B24"/>
+      <circle cx="12" cy="19.4" r="2" fill="#C42A36"/>
+    </symbol>
+    <symbol id="ball" viewBox="0 0 80 80">
+      <circle cx="40" cy="40" r="34" fill="#FFFDF7" stroke="#1D2B24" stroke-width="3"/>
+      <path d="M8 34c14 6 50 6 64 0M8 46c14-6 50-6 64 0M40 6c-9 14-9 54 0 68M40 6c9 14 9 54 0 68" fill="none" stroke="#B3242F" stroke-width="2.5"/>
+      <path d="M22 9l4 8M58 9l-4 8" stroke="#1F5A41" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="24" cy="8" r="4" fill="#B3242F"/><circle cx="30" cy="10" r="3.4" fill="#B3242F"/>
+      <path d="M14 10c6-6 12-4 14 1-6 2-11 2-14-1zM46 11c3-5 10-6 15-1-5 3-11 3-15 1z" fill="#1F5A41"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="app">
+  <header class="hero">
+    <div class="hero-top">
+      <svg class="hero-ball" aria-hidden="true"><use href="#ball"/></svg>
+      <div>
+        <p class="eyebrow">Live scores</p>
+        <h1><span>The Festive</span> Netball Tournament</h1>
+      </div>
+    </div>
+    <div class="hero-status">
+      <div class="progress" aria-live="polite">
+        <div class="progress-text"><strong id="played-count">0</strong> of 14 games played</div>
+        <div class="progress-bar"><i id="progress-fill"></i></div>
+      </div>
+      <button class="next" id="next-game" type="button"></button>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="Sections">
+    <a href="#games" data-tab="games">Games</a>
+    <a href="#table" data-tab="table">Table</a>
+    <a href="#versus" data-tab="versus">Head to head</a>
+    <a href="#finals" data-tab="finals">Finals</a>
+  </nav>
+
+  <div id="banner" class="banner" hidden></div>
+
+  <main>
+    <section id="view-games" class="view" aria-labelledby="h-games">
+      <h2 id="h-games" class="sr-only">Games</h2>
+      <div id="rounds"></div>
+    </section>
+
+    <section id="view-table" class="view" aria-labelledby="h-table" hidden>
+      <div class="panel">
+        <div class="panel-head">
+          <h2 id="h-table">League table</h2>
+          <p>Top two play the Grand Final. Third and fourth play for third place.</p>
+        </div>
+        <div class="scroll"><table class="league" id="league"></table></div>
+        <div class="legend">
+          <span><i class="sw sw-gold"></i>Grand Final places</span>
+          <span><i class="sw sw-green"></i>Third-place playoff</span>
+          <span>Ties split by goal difference, then goals scored.</span>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>How points work</h2></div>
+        <div class="points-key">
+          <div class="pk win"><b>5</b><span>Win</span></div>
+          <div class="pk draw"><b>3</b><span>Draw</span></div>
+          <div class="pk bonus"><b>1</b><span>Loss, scoring more than half the winner's goals</span></div>
+          <div class="pk"><b>0</b><span>Any other loss</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-versus" class="view" aria-labelledby="h-versus" hidden>
+      <div class="panel">
+        <div class="panel-head">
+          <h2 id="h-versus">Head to head</h2>
+          <p>Each team meets every other team twice. Read across a row to see how that team did against each opponent. Tap a result to change it.</p>
+        </div>
+        <div class="scroll"><table class="versus" id="versus"></table></div>
+      </div>
+      <div class="team-cards" id="team-cards"></div>
+    </section>
+
+    <section id="view-finals" class="view" aria-labelledby="h-finals" hidden>
+      <div class="panel">
+        <div class="panel-head">
+          <h2 id="h-finals">The finals</h2>
+          <p id="finals-note"></p>
+        </div>
+        <div class="finals" id="finals"></div>
+      </div>
+      <div class="panel podium-panel">
+        <div class="panel-head"><h2>Final positions</h2></div>
+        <div class="podium" id="podium"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="foot-actions">
+      <button type="button" class="btn ghost" id="share">Share results link</button>
+      <button type="button" class="btn ghost danger" id="reset">Start again</button>
+    </div>
+    <p>Scores are saved on this device. Use <b>Share results link</b> to send everyone the latest scores.</p>
+  </footer>
+</div>
+
+<dialog id="score-dialog" aria-labelledby="sd-title">
+  <form method="dialog" id="score-form">
+    <div class="sd-head">
+      <p class="eyebrow" id="sd-round"></p>
+      <h2 id="sd-title"></h2>
+    </div>
+    <div class="sd-teams">
+      <div class="sd-team" data-side="0"></div>
+      <div class="sd-v">v</div>
+      <div class="sd-team" data-side="1"></div>
+    </div>
+    <div class="sd-golden" id="sd-golden" hidden>
+      <p>Level! Who scored the golden goal?</p>
+      <div class="gg-buttons"></div>
+    </div>
+    <p class="sd-outcome" id="sd-outcome"></p>
+    <div class="sd-actions">
+      <button type="button" class="btn ghost danger" id="sd-clear">Clear result</button>
+      <span class="spacer"></span>
+      <button type="button" class="btn ghost" id="sd-cancel">Cancel</button>
+      <button type="submit" class="btn primary" id="sd-save">Save result</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="confirm-dialog" aria-labelledby="cd-title">
+  <form method="dialog">
+    <h2 id="cd-title">Start again?</h2>
+    <p id="cd-text">This clears every score on this device. You can't undo it.</p>
+    <div class="sd-actions">
+      <span class="spacer"></span>
+      <button type="button" class="btn ghost" id="cd-cancel">Cancel</button>
+      <button type="button" class="btn primary danger-fill" id="cd-ok">Clear all scores</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
