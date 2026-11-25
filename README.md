@@ -1,4 +1,4 @@
-# Festive Netball Tournament
+# Freemens' Festive Netball Tournament
 
 Live scores for a four-team Christmas netball tournament: Jingle Ballers, Santa's Shooters, Nutcrackers and Reindeer Rebels.
 

@@ -472,7 +472,7 @@ function decode(str) {
 $("#share").addEventListener("click", async () => {
   const url = `${location.origin}${location.pathname}#r=${encode()}`;
   if (navigator.share) {
-    try { await navigator.share({ title: "Festive Netball Tournament", text: "Latest scores", url }); return; } catch (err) { if (err.name === "AbortError") return; }
+    try { await navigator.share({ title: "Freemens' Festive Netball Tournament", text: "Latest scores", url }); return; } catch (err) { if (err.name === "AbortError") return; }
   }
   try { await navigator.clipboard.writeText(url); toast("Link copied. Paste it to share the scores."); }
   catch (_) { window.prompt("Copy this link:", url); }
