@@ -68,7 +68,13 @@ h1 {
 }
 h1 span { color: var(--gold); }
 
-.hero-status { margin-top: 18px; display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; }
+.hero-status { margin-top: 18px; display: grid; gap: 16px; }
+.next-label { margin: 0 0 8px; font-size: 12px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
+.next-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.next-teams { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.next-teams b, .next.done b { display: inline-flex; align-items: center; gap: 6px; }
+.next-teams i { font-family: var(--display); font-style: normal; font-weight: 700; font-size: 18px; color: var(--berry); }
+.next .crest { width: 24px; height: 24px; }
 .progress-text { font-weight: 700; color: var(--frost-dim); font-size: 14px; margin-bottom: 6px; }
 .progress-text strong { color: #fff; font-size: 18px; }
 .progress-bar { height: 12px; border-radius: 12px; background: rgba(255,255,255,.1); overflow: hidden; }
@@ -365,7 +371,10 @@ dialog .eyebrow { color: var(--berry); }
   h1 { font-size: 34px; }
   .eyebrow { font-size: 11px; }
   .hero-status { grid-template-columns: 1fr; gap: 12px; margin-top: 12px; }
-  .next { width: 100%; padding: 12px 16px; }
+  .next { width: 100%; padding: 10px 14px; }
+  .next-buttons { grid-template-columns: 1fr; gap: 10px; }
+  .next-teams { gap: 4px 6px; }
+  .next b { font-size: 15px; }
 
   /* bottom tab bar, iOS style */
   .tabs {

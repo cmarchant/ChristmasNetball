@@ -127,19 +127,19 @@ function teamsFor(n) {
   const f = finalists();
   return f ? f[n] : null;
 }
-function nextGame() {
-  const g = LEAGUE.find(x => !result(x.n));
-  if (g) return g.n;
-  const f = finalists();
-  if (!f) return null;
-  return [13, 14].find(n => !result(n)) ?? null;
+// The next two games still to score: two are played at the same time.
+function nextGames() {
+  const league = LEAGUE.filter(x => !result(x.n)).slice(0, 2).map(x => x.n);
+  if (league.length) return league;
+  if (!finalists()) return [];
+  return [13, 14].filter(n => !result(n));
 }
 
 /* ================= Rendering ================= */
 function matchCard(n, opts = {}) {
   const teams = teamsFor(n);
   const r = result(n);
-  const isNext = nextGame() === n;
+  const isNext = nextGames().includes(n);
   const locked = !teams;
   const fin = FINALS.find(f => f.n === n);
   let lines;
@@ -171,21 +171,26 @@ function renderHero() {
   const played = playedCount();
   $("#played-count").textContent = played;
   $("#progress-fill").style.width = `${(played / 14) * 100}%`;
-  const btn = $("#next-game");
-  const n = nextGame();
+  const wrap = $("#next-games");
+  const next = nextGames();
   const champ = placings()[0];
-  btn.classList.toggle("done", !n);
+  let label, buttons;
   if (champ) {
-    btn.innerHTML = `<small>Champions</small><b>${esc(TEAMS[champ].name)}</b>`;
-    btn.dataset.go = "finals";
-  } else if (n) {
-    const t = teamsFor(n);
-    btn.innerHTML = `<small>Next up · Game ${n}</small><b>${esc(TEAMS[t[0]].name)} v ${esc(TEAMS[t[1]].name)}</b>`;
-    btn.dataset.go = "";
+    label = "Tournament over";
+    buttons = `<button type="button" class="next done" data-go="finals"><small>Champions</small><b>${crest(champ)}${esc(TEAMS[champ].name)}</b></button>`;
+  } else if (next.length) {
+    label = next.length > 1 ? "Next up · played at the same time" : "Next up";
+    buttons = next.map(n => {
+      const t = teamsFor(n);
+      const fin = FINALS.find(f => f.n === n);
+      return `<button type="button" class="next" data-next="${n}"><small>Game ${n}${fin ? ` · ${fin.name}` : ""}</small>
+        <span class="next-teams"><b>${crest(t[0])}${esc(TEAMS[t[0]].name)}</b><i>v</i><b>${crest(t[1])}${esc(TEAMS[t[1]].name)}</b></span></button>`;
+    }).join("");
   } else {
-    btn.innerHTML = `<small>All games scored</small><b>See the finals</b>`;
-    btn.dataset.go = "finals";
+    label = "League finished";
+    buttons = `<button type="button" class="next done" data-go="finals"><small>All league games scored</small><b>See the finals</b></button>`;
   }
+  wrap.innerHTML = `<p class="next-label">${label}</p><div class="next-buttons">${buttons}</div>`;
 }
 
 function renderGames() {
@@ -443,11 +448,11 @@ document.addEventListener("click", e => {
   const card = e.target.closest("button[data-game]");
   if (card && !dlg.open) { openScore(Number(card.dataset.game)); return; }
 });
-$("#next-game").addEventListener("click", () => {
-  const go = $("#next-game").dataset.go;
-  if (go) { location.hash = go; showTab(go, true); return; }
-  const n = nextGame();
-  if (n) openScore(n);
+$("#next-games").addEventListener("click", e => {
+  const btn = e.target.closest("button");
+  if (!btn) return;
+  if (btn.dataset.go) { showTab(btn.dataset.go, true); return; }
+  openScore(Number(btn.dataset.next));
 });
 
 /* ================= Share & reset ================= */
